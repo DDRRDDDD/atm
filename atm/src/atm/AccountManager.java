@@ -1,11 +1,7 @@
 package atm;
 
-import java.util.ArrayList;
-
 public class AccountManager {
-	private static ArrayList<Account> list = new ArrayList<>();
-	
-	// Account 에 대한
+	private final int LIMMIT = 3;
 	
 	// Create
 	// Read
