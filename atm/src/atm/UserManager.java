@@ -1,22 +1,19 @@
 package atm;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class UserManager {
 	private static ArrayList<User> list = new ArrayList<>();
 	
-	private UserManager() {
-		throw new AssertionError("안된다 돌아가");
+	public void addUser(String name, String pw) {
+		String id = getPrimaryId();
+		list.add(new User(id, pw, name));
 	}
 	
-	//Create
-	public static void addUser(User user) {
-		list.add(user);
-	}
-	
-	//Read
-	public static User getUser(int index) {
-		if(list.size() < 1)
+	// 사본을 반환
+	public User getUser(int index) {
+		if(list.size()-1 < index)
 			return null;
 		
 		User user = list.get(index);
@@ -25,19 +22,48 @@ public class UserManager {
 		String password = user.getPassword();
 		String name = user.getName();
 		
-		return new User(id, password, name);
+		User tmp = new User(id, password, name);
+		int length = AccountManager.LIMMIT;
+		for(int i = 0; i < length; i++) {
+			Account acc = user.getAcc(i);
+			if(acc == null)
+				break;
+			
+			tmp.addAcc(acc);
+		}
+		return tmp;
 	}
 	
-	//Update
-	public static void setUser(int index, User user) {
-		if(list.size() < 1)
+	public void setUser(int index, User user) {
+		if(list.size()-1 < index)
 			return;
-		
+
 		list.set(index, user);
 	}
 	
-	//Delete
-	public static void deleteUser(int index) {
+	public void deleteUser(int index) {
+		if(list.size()-1 < index)
+			return;
+		
 		list.remove(index);
 	}
+	
+	private String getPrimaryId() {
+		Random ran = new Random();
+		String key = "";
+		loop:while(true) {
+			int randomNum = ran.nextInt(9000) + 1001;
+			key = String.valueOf(randomNum);
+			
+			for(int i = 0; i < list.size(); i++) {
+				String str = list.get(i).getId();
+				if(str.equals(key))
+					continue loop;
+			}
+			break;
+		}
+		
+		return key;
+	}
+	
 }

@@ -1,16 +1,19 @@
 package atm;
 
-import java.util.Objects;
+import java.util.ArrayList;
 
 public class User {
 	private String id;
 	private String password;
 	private String name;
 	
+	private ArrayList<Account> acc;
+	
 	public User(String id, String password, String name) {
 		this.id = id;
 		this.password = password;
 		this.name = name;
+		this.acc = new ArrayList<Account>();
 	}
 	
 	public String getId() {
@@ -24,23 +27,17 @@ public class User {
 	public String getName() {
 		return this.name;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+	
+	public Account getAcc(int index) {
+		if(index > this.acc.size() - 1)
+			return null;
 		
-		User user = (User)obj;
-		boolean idIsTrue = Objects.equals(this.id, user.id);
-		boolean nameIsTrue = Objects.equals(this.name, user.name);
-		boolean passwordIsTrue = Objects.equals(this.name, user.name);
-		
-		return idIsTrue && nameIsTrue && passwordIsTrue;
+		return acc.get(index);
 	}
 	
+	public void addAcc(Account acc) {
+		
+		this.acc.add(acc);
+	}
 	
 }

@@ -1,17 +1,18 @@
 package atm;
 
 public class Account {
-	private String id;
+	private String userId;
 	private String accNumber;
 	private int money;
 	
-	public Account(String id, String accNumber) {
-		this.id = id;
+	public Account(String userId, String accNumber, int money) {
+		this.userId = userId;
 		this.accNumber = accNumber;
+		this.money = 0;
 	}
 	
-	public String getId() {
-		return this.id;
+	public String getUserId() {
+		return this.userId;
 	}
 	
 	public String getAccNumber() {
@@ -25,4 +26,11 @@ public class Account {
 	public void setMoney(int money) {
 		this.money = money;
 	}
+
+	@Override
+	public String toString() {
+		return "userId :" + userId + "\n accNumber :" + accNumber + "\n money :" + money;
+	}
+	
+	
 }
