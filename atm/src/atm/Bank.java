@@ -3,20 +3,26 @@ package atm;
 import java.util.Scanner;
 
 public class Bank {
+	private String brandName;
+	
+	private FileManager fm;
 	private AccountManager am;
 	private UserManager um;
 
 	private Scanner sc;
 	private int log;
+	
 
-	public Bank() {
+	public Bank(String brandName) {
+		this.brandName = brandName;
 		this.am = new AccountManager();
 		this.um = new UserManager();
 		this.sc = new Scanner(System.in);
 		this.log = -1;
+		
+		this.fm = new FileManager(this.brandName);
 	}
 	private int inputNumber() {
-		System.out.println("메뉴 선택)");
 		int input = 0;
 		try {
 			input = this.sc.nextInt();
@@ -109,7 +115,7 @@ public class Bank {
 			System.out.println("로그인 후 이용 가능한 서비스입니다");
 			return;
 		}
-		System.out.println("insert accNumber");
+		System.out.println("(input accNumber)");
 		String accNumber = this.sc.next();
 		
 		int index = duplAccNumber(accNumber);
@@ -189,31 +195,171 @@ public class Bank {
 		}
 		this.log = -1;
 	}
+	
+	private Account searchAccount(String accNum, int index) {
+		Account acc = null;
+		User user = this.um.getUser(index);
+		int length = AccountManager.LIMMIT;
+		for(int i = 0; i < length; i++) {
+			acc = user.getAcc(i);
+			if(acc == null)
+				break;
+			
+			if(accNum.equals(acc.getAccNumber())) 
+				return acc;
+		}
+		return null;
+	}
+	
+	private void inquiry() {
+		System.out.println("(input accNumber)");
+		String accNum = this.sc.next();
+		
+		
+		Account acc = searchAccount(accNum, this.log);
+		if(acc == null) {
+			System.out.println("계좌가 없음");
+			return;
+		}
+		
+		int money = acc.getMoney();
+		System.out.printf("현재 잔액 %d원입니다\n\n", money);
+	}
+	
+	private void deposit() {
+		System.out.println("(input accNumber)");
+		String accNum = this.sc.next();
+		
+		Account acc = searchAccount(accNum, this.log);
+		
+		if(acc == null) {
+			System.out.println("계좌가 없음");
+			return;
+		}
+		
+		int curMoney = acc.getMoney();
+		System.out.println("(input money)");
+		int inputMoney = inputNumber();
+		
+		curMoney += inputMoney;
+		
+		System.out.printf("현재 잔액 : %d원입니다\n\n", curMoney);
+		acc.setMoney(curMoney);
+		
+		
+	}
+	
+	private void withdraw() {
+		System.out.println("(input accNumber)");
+		String accNum = this.sc.next();
+		
+		Account acc = searchAccount(accNum, this.log);
+				
+		if(acc == null) {
+			System.out.println("계좌가 없음");
+			return;
+		}
+		
+		int curMoney = acc.getMoney();
+		System.out.println("(input money)");
+		int inputMoney = inputNumber();
+		
+		curMoney -= inputMoney;
+		
+		if(curMoney < 0) {
+			System.out.println("잔액이 부족합니다");
+			return;
+		}
+		
+		System.out.printf("현재 잔액 : %d원입니다\n\n", curMoney);
+		acc.setMoney(curMoney);
+		
+	}
+	
+	private void transfer() {
+		System.out.println("(input *MY* accNumber)");
+		String myAccNum = this.sc.next();
+		
+		Account myAcc = searchAccount(myAccNum, this.log);
+		if(myAcc == null) {
+			System.out.println("계좌가 없음");
+			return;
+		}
+		
+		System.out.println("(input *who to send* accNumber)");
+		String anotherAccNum = this.sc.next();
+		
+		int idx = 0;
+		Account anotherAcc = null;
+		while(this.um.getUser(idx) != null) {
+			anotherAcc = searchAccount(anotherAccNum , idx);
+			idx++;
+		}
+		
+		if(anotherAcc == null) {
+			System.out.println("계좌가 없음");
+			return;
+		}
+		
+		System.out.println("(input money)");
+		int inputMoney = inputNumber();
+		int curMoney = myAcc.getMoney();
+		curMoney -= inputMoney;
+		
+		if(curMoney < 0) {
+			System.out.println("잔액 부족");
+			return;
+		}
+		myAcc.setMoney(curMoney);
+		
+		int anotherMoney = anotherAcc.getMoney();
+		anotherMoney += inputMoney;
+		anotherAcc.setMoney(anotherMoney);
+	}
 
 	public void run() {
-
+		loadData();
 		while(true) {
-			userStatus();
-			printMenu();
+			this.am.testrPint();
+			printMainMenu();
 			int sel = inputNumber();
-			if(sel == 0) break;
+			if(sel == 0) {saveData(); break;}
 			else if(sel == 1) signUp();
 			else if(sel == 2) dropUser();
-			else if(sel == 3) accApplicate();
-			else if(sel == 4) accDrop();
-			else if(sel == 5) logIn();
-			else if(sel == 6) signOut();
+			else if(sel == 3) {logIn();	serviceMenu();};
 		}
 		this.sc.close();
 	}
+	
+	private void serviceMenu() {
+		while(true) {
+			userStatus();
+			printServiceMenu();
+			int sel = inputNumber();
+			if(sel == 1) accApplicate();
+			else if(sel == 2) accDrop();
+			else if(sel == 3) inquiry();
+			else if(sel == 4) deposit();
+			else if(sel == 5) withdraw();
+			else if(sel == 6) transfer();
+			else if(sel == 7) {signOut(); break;}
+		}
+	}
+	
+	private void printServiceMenu() {
+		System.out.println("1) 계좌신청");
+		System.out.println("2) 계좌철회");
+		System.out.println("3) 조회");
+		System.out.println("4) 입금");
+		System.out.println("5) 출금");
+		System.out.println("6) 이체");
+		System.out.println("7) 로그아웃");
+	}
 
-	private void printMenu() {
+	private void printMainMenu() {
 		System.out.println("1. 회원가입");
-		System.out.println("2. 회원탈퇴");
-		System.out.println("3. 계좌신청");
-		System.out.println("4. 계좌철회");
-		System.out.println("5. 로그인");
-		System.out.println("6. 로그아웃");
+		System.out.println("2. 회원탈퇴");  
+		System.out.println("3. 로그인"); 
 		System.out.println("0. 종료");
 	}
 	
@@ -226,7 +372,7 @@ public class Bank {
 		String password = user.getPassword();
 		String id = user.getId();
 		
-		System.out.println("유저 ID : " +id);
+		System.out.println("고유 ID : " +id);
 		System.out.println("이름    : " +name);
 		System.out.println("비밀번호 : " +password);
 		
@@ -237,7 +383,16 @@ public class Bank {
 				return;
 			}
 			System.out.println("ㄴ ("+ acc.getAccNumber()+")");
+			System.out.println("	ㄴ ("+ acc.getMoney()+"원)");
+			
 		}
+	}
+	
+	private void saveData() {
+		this.fm.save();
+	}
+	private void loadData() {
+		this.fm.load();
 	}
 
 }

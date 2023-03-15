@@ -8,10 +8,18 @@ public class AccountManager {
 	
 	private static ArrayList<Account> list = new ArrayList<>();
 	
+	// 임시 출력문///////////////////////////////
 	public void testrPint() {
+//		System.out.println(list.size());
 		for(Account i : list) {
 			System.out.println(i.getAccNumber());
+			System.out.println(i.getMoney());
 		}
+	}
+	///////////////////////////////////////////
+	
+	public void createAccount(Account acc) {
+		list.add(acc);
 	}
 	
 	public Account createAccount(User user) {

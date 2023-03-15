@@ -27,10 +27,10 @@ public class Account {
 		this.money = money;
 	}
 
-	@Override
-	public String toString() {
-		return "userId :" + userId + "\n accNumber :" + accNumber + "\n money :" + money;
-	}
-	
+//	@Override
+//	public String toString() {
+//		return "userId :" + userId + "\n accNumber :" + accNumber + "\n money :" + money;
+//	}
+//	
 	
 }
