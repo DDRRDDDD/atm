@@ -11,6 +11,10 @@ public class UserManager {
 		list.add(new User(id, pw, name));
 	}
 	
+	public void addUser(User user) {
+		list.add(user);
+	}
+	
 	// 사본을 반환
 	public User getUser(int index) {
 		if(list.size()-1 < index)
